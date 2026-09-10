@@ -1,6 +1,13 @@
 <div align="center">
   <h1>3D Delivery System</h1>
   <p>Interactive 3D waypoint / delivery visualization built with <strong>React</strong>, <strong>Three.js</strong>, and <strong>Vite</strong>.</p>
+
+  <p>
+    <img alt="Vite" src="https://img.shields.io/badge/Vite-5.x-646CFF?logo=vite&logoColor=white" />
+    <img alt="React" src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=0B1020" />
+    <img alt="Three.js" src="https://img.shields.io/badge/Three.js-r160-111111?logo=three.js&logoColor=white" />
+    <img alt="Deploy" src="https://img.shields.io/badge/Deploy-Vercel-000000?logo=vercel&logoColor=white" />
+  </p>
 </div>
 
 ---
@@ -99,8 +106,6 @@ npm run preview
 - **Output directory:** `dist`
 
 ### Option B: CLI deploy
-
-If you prefer the Vercel CLI:
 
 ```bash
 npm i -g vercel
