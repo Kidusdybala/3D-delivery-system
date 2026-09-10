@@ -1,0 +1,18 @@
+PEAK Delivery — Strategy Document (Placeholder)
+
+This file is a placeholder so the website can demonstrate:
+- Donation flow
+- Pay → unlock → download
+
+Replace this file with your real strategy document.
+
+Suggested sections to include:
+1) Mission + target customers
+2) Pricing model (base + distance + service % + tax)
+3) Product sourcing process (Perfumes / Wi-Fi routers / Watches)
+4) Bank QR donation list (all banks)
+5) Growth plan (Telegram / TikTok / Facebook)
+6) Feedback collection (voice/video)
+7) Operations: pickup, dispatch, proof of delivery
+
+Last updated: 2026-09-09
