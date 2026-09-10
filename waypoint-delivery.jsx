@@ -380,7 +380,8 @@ function DeliveryScene({ className, vehicle }) {
     );
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const isSmallScreen = window.innerWidth <= 720;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isSmallScreen ? 1.5 : 2));
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.4;
@@ -411,8 +412,27 @@ function DeliveryScene({ className, vehicle }) {
 
     const center = new THREE.Vector3(0.5, 0, 0.2);
     let angle = 0.9;
-    const baseRadius = 14;
-    const baseHeight = 7.5;
+    let baseRadius = 14;
+    let baseHeight = 7.5;
+
+    // pull the camera back and give a slightly higher vantage on narrow
+    // (portrait / mobile) viewports so the whole scene still reads well
+    function tuneCameraForAspect(aspect) {
+      if (aspect < 0.62) {
+        baseRadius = 22;
+        baseHeight = 11.5;
+      } else if (aspect < 0.85) {
+        baseRadius = 19;
+        baseHeight = 10;
+      } else if (aspect < 1.15) {
+        baseRadius = 16.5;
+        baseHeight = 8.5;
+      } else {
+        baseRadius = 14;
+        baseHeight = 7.5;
+      }
+    }
+    tuneCameraForAspect(camera.aspect);
 
     const mouse = { x: 0, y: 0 };
     const mouseTarget = { x: 0, y: 0 };
@@ -520,6 +540,7 @@ function DeliveryScene({ className, vehicle }) {
       const h = mount.clientHeight;
       if (w === 0 || h === 0) return;
       camera.aspect = w / h;
+      tuneCameraForAspect(camera.aspect);
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
     });
@@ -565,7 +586,7 @@ function DeliveryScene({ className, vehicle }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Tilt card: cursor-driven 3D perspective tilt                       */
+/*  Tilt card: pointer-driven 3D perspective tilt (mouse + touch)      */
 /* ------------------------------------------------------------------ */
 
 function TiltCard({ children, className, style }) {
@@ -583,7 +604,13 @@ function TiltCard({ children, className, style }) {
   }
   function handleLeave() {
     const el = ref.current;
-    if (el) el.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg)";
+    if (!el) return;
+    el.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg)";
+    el.style.touchAction = "";
+  }
+  function handleDown() {
+    const el = ref.current;
+    if (el) el.style.touchAction = "none";
   }
 
   return (
@@ -591,7 +618,10 @@ function TiltCard({ children, className, style }) {
       ref={ref}
       className={className}
       style={style}
-      onMouseMove={handleMove}
+      onPointerDown={handleDown}
+      onPointerMove={handleMove}
+      onPointerUp={handleLeave}
+      onPointerCancel={handleLeave}
       onMouseLeave={handleLeave}
     >
       {children}
@@ -1842,6 +1872,17 @@ export default function App() {
           .wp-nav-cta-desktop { display: none; }
           .wp-nav-toggle { display: flex; }
           .wp-nav-mobile { display: flex; }
+          .wp-form { grid-template-columns: 1fr; }
+          .wp-form .span-2 { grid-column: span 1; }
+          .wp-pay-panel { grid-template-columns: 1fr; padding: 20px; }
+          .wp-pay-divider { width: auto; height: 1px; }
+          .wp-grid-3 { grid-template-columns: 1fr 1fr; }
+          .wp-feature-grid { grid-template-columns: 1fr 1fr; }
+          .wp-contact-grid { grid-template-columns: 1fr; }
+          .wp-hero-content { padding-bottom: 40px; }
+          .wp-hero h1 { max-width: none; }
+          .wp-track-input-row { flex-direction: column; }
+          .wp-track-input-row button { padding: 11px 18px; }
         }
         @media (max-width: 520px) {
           .wp-feature-grid { grid-template-columns: 1fr; }
