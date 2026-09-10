@@ -1,25 +1,48 @@
-# 3D Delivery System (Waypoint Delivery)
+<div align="center">
+  <h1>3D Delivery System</h1>
+  <p>Interactive 3D waypoint / delivery visualization built with <strong>React</strong>, <strong>Three.js</strong>, and <strong>Vite</strong>.</p>
+</div>
 
-Interactive 3D waypoint/delivery visualization built with **React**, **Three.js**, and **Vite**.
+---
 
-## Tech stack
+## Table of Contents
 
-- React 18
-- Three.js
-- Vite 5
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Features](#features)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Install](#install)
+  - [Run Locally](#run-locally)
+  - [Build](#build)
+  - [Preview Production Build](#preview-production-build)
+- [Project Structure](#project-structure)
+- [Deployment (Vercel)](#deployment-vercel)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
+
+## Overview
+
+This project is a lightweight 3D delivery/waypoint visualization. It uses React for UI composition and Three.js for rendering the 3D scene.
+
+## Tech Stack
+
+- **React 18**
+- **Three.js**
+- **Vite 5**
 
 ## Features
 
 - 3D scene rendered with Three.js
 - Waypoint / route visualization
-- Lightweight UI layer (React)
+- Simple, fast dev experience (Vite)
 
-## Getting started
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ recommended
-- npm (works with other Node package managers too, but this repo includes a `package-lock.json`)
+- Node.js **18+** recommended
+- npm (the repo includes `package-lock.json`)
 
 ### Install
 
@@ -35,42 +58,59 @@ npm run dev
 
 Vite will print the local URL (typically `http://localhost:5173`).
 
-### Build for production
+### Build
 
 ```bash
 npm run build
 ```
 
-### Preview the production build
+### Preview production build
 
 ```bash
 npm run preview
 ```
 
-## Project structure
+## Project Structure
 
 ```text
 .
 ├─ public/
+│  └─ peak-strategy-document.txt
 ├─ src/
 │  └─ main.jsx              # React entry
-├─ waypoint-delivery.jsx    # Main 3D/scene logic
+├─ waypoint-delivery.jsx    # Main 3D / scene logic
 ├─ index.html
 ├─ vite.config.js
-└─ package.json
+├─ package.json
+└─ package-lock.json
 ```
 
 ## Deployment (Vercel)
 
-1. In Vercel, click **New Project** → import the GitHub repo.
-2. Use these settings (Vite):
+### Option A: Import from GitHub (recommended)
+
+1. In Vercel, click **New Project**.
+2. Import the GitHub repository.
+3. Use these settings:
 
 - **Framework preset:** Vite
 - **Install command:** `npm install`
 - **Build command:** `npm run build`
 - **Output directory:** `dist`
 
-If you ever see a blank page after deploy, double-check the **Output directory** is set to `dist`.
+### Option B: CLI deploy
+
+If you prefer the Vercel CLI:
+
+```bash
+npm i -g vercel
+vercel
+```
+
+## Troubleshooting
+
+- **Blank page after deploy**: confirm the Vercel **Output directory** is `dist` and the build is using `npm run build`.
+- **Build fails**: make sure you’re using a recent Node version (18+).
 
 ## License
 
