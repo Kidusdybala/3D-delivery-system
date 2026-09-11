@@ -1089,8 +1089,12 @@ export default function App() {
           color: var(--text);
           min-height: 100vh;
           width: 100%;
+          min-width: 100%;
+          max-width: 100%;
+          overflow-x: hidden;
         }
-        .wp-root * { box-sizing: border-box; }
+        .wp-root * { box-sizing: border-box; max-width: 100%; }
+        .wp-root img, .wp-root svg, .wp-root video, .wp-root audio, .wp-root canvas { max-width: 100%; display: block; }
         .wp-root h1, .wp-root h2 {
           font-family: 'Fraunces', Georgia, serif;
           font-weight: 600;
@@ -1852,6 +1856,34 @@ export default function App() {
         .wp-footer-brand { font-size: 13px; color: var(--muted); }
         .wp-footer-brand b { color: var(--text); font-family: 'Fraunces', serif; }
 
+        .wp-peak-grid, .wp-feature-grid, .wp-contact-grid, .wp-grid-3, .wp-pay-panel, .wp-form, .wp-hero-content {
+          min-width: 0;
+          width: 100%;
+        }
+        .wp-card, .wp-feature-card, .wp-bank-card, .wp-contact-card, .wp-pay-methods, .wp-scan-area,
+        .wp-timeline-item, .wp-track-box, .wp-pay-divider {
+          min-width: 0;
+          max-width: 100%;
+        }
+        .wp-nav, .wp-nav-mobile, .wp-hero, .wp-status, .wp-pay, .wp-peak, .wp-features, .wp-footer {
+          width: 100%;
+          min-width: 0;
+          max-width: 100%;
+        }
+        .wp-nav {
+          padding-left: max(18px, env(safe-area-inset-left));
+          padding-right: max(18px, env(safe-area-inset-right));
+        }
+        .wp-nav-mobile {
+          padding-left: max(20px, env(safe-area-inset-left));
+          padding-right: max(20px, env(safe-area-inset-right));
+        }
+        .wp-hero-content, .wp-status, .wp-pay, .wp-peak, .wp-features, .wp-footer {
+          padding-left: max(18px, env(safe-area-inset-left));
+          padding-right: max(18px, env(safe-area-inset-right));
+        }
+        .wp-hero-hint { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90vw; }
+
         @media (max-width: 860px) {
           .wp-hero-content { grid-template-columns: 1fr; }
           .wp-feature-grid { grid-template-columns: 1fr 1fr; }
@@ -1879,23 +1911,23 @@ export default function App() {
           .wp-grid-3 { grid-template-columns: 1fr 1fr; }
           .wp-feature-grid { grid-template-columns: 1fr 1fr; }
           .wp-contact-grid { grid-template-columns: 1fr; }
-          .wp-hero-content { padding-bottom: 40px; }
+          .wp-hero-content { padding-bottom: 56px; }
           .wp-hero h1 { max-width: none; }
           .wp-track-input-row { flex-direction: column; }
           .wp-track-input-row button { padding: 11px 18px; }
         }
         @media (max-width: 520px) {
           .wp-feature-grid { grid-template-columns: 1fr; }
-          .wp-hero { min-height: 520px; }
-          .wp-nav { padding: 14px 18px; }
+          .wp-hero { min-height: 620px; }
+          .wp-nav { padding-top: 14px; padding-bottom: 14px; padding-left: max(18px, env(safe-area-inset-left)); padding-right: max(18px, env(safe-area-inset-right)); }
           .wp-hero-content, .wp-status, .wp-pay, .wp-features, .wp-footer {
-            padding-left: 18px;
-            padding-right: 18px;
+            padding-left: max(18px, env(safe-area-inset-left));
+            padding-right: max(18px, env(safe-area-inset-right));
           }
-          .wp-peak { padding-left: 18px; padding-right: 18px; }
+          .wp-peak { padding-left: max(18px, env(safe-area-inset-left)); padding-right: max(18px, env(safe-area-inset-right)); }
           .wp-grid-3 { grid-template-columns: 1fr; }
-          .wp-hero-hint { bottom: 150px; font-size: 10.5px; }
-          .wp-vehicle-toggle { top: 16px; right: 18px; }
+          .wp-hero-hint { bottom: 160px; font-size: 11px; }
+          .wp-vehicle-toggle { top: 16px; right: max(18px, env(safe-area-inset-right)); }
           .wp-vehicle-toggle button { padding: 6px 9px; font-size: 11.5px; }
           .wp-pay-methods { gap: 8px; }
           .wp-form { grid-template-columns: 1fr; }
