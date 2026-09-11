@@ -360,7 +360,6 @@ function DeliveryScene({ className, vehicle }) {
   const sceneRef = useRef(null);
   const vehicleRef = useRef({ group: null, marker: null, bobBase: 1 });
 
-  // main scene setup — runs once
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
@@ -368,28 +367,32 @@ function DeliveryScene({ className, vehicle }) {
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
+    const isMobile = typeof window !== "undefined" &&
+      (window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent || ""));
+    const isPortrait = window.innerHeight > window.innerWidth;
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x0b0f1a, 20, 40);
+    scene.fog = new THREE.Fog(0x0b0f1a, isMobile && isPortrait ? 8 : 20, isMobile && isPortrait ? 26 : 40);
 
+    const baseFov = isMobile ? (isPortrait ? 62 : 56) : 42;
     const camera = new THREE.PerspectiveCamera(
-      42,
+      baseFov,
       mount.clientWidth / Math.max(mount.clientHeight, 1),
       0.1,
-      100
+      120
     );
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
     const isSmallScreen = window.innerWidth <= 720;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isSmallScreen ? 1.5 : 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isSmallScreen ? 2 : 2));
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.4;
+    renderer.toneMappingExposure = isMobile ? 1.55 : 1.4;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     mount.appendChild(renderer.domElement);
 
     const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(70, 40),
+      new THREE.PlaneGeometry(90, 60),
       new THREE.MeshStandardMaterial({ color: 0x1c2436, roughness: 1 })
     );
     ground.rotation.x = -Math.PI / 2;
@@ -399,38 +402,72 @@ function DeliveryScene({ className, vehicle }) {
     buildRoad(scene);
     buildBuildings(scene);
 
-    const ambient = new THREE.AmbientLight(0x3a4868, 1.1);
+    const ambient = new THREE.AmbientLight(0x3a4868, isMobile ? 1.25 : 1.1);
     scene.add(ambient);
-    const moon = new THREE.DirectionalLight(0x8fa8ff, 0.9);
+    const moon = new THREE.DirectionalLight(0x8fa8ff, isMobile ? 1.0 : 0.9);
     moon.position.set(8, 14, -6);
     scene.add(moon);
-    const fill = new THREE.DirectionalLight(0x4a6fa8, 0.4);
+    const fill = new THREE.DirectionalLight(0x4a6fa8, isMobile ? 0.55 : 0.4);
     fill.position.set(-8, 6, 8);
     scene.add(fill);
+    const rim = new THREE.DirectionalLight(0xffc48a, 0.35);
+    rim.position.set(-4, 3, -10);
+    scene.add(rim);
 
     sceneRef.current = { scene, camera, renderer };
 
-    const center = new THREE.Vector3(0.5, 0, 0.2);
+    const center = new THREE.Vector3(0.5, 0.1, 0.2);
     let angle = 0.9;
     let baseRadius = 14;
     let baseHeight = 7.5;
+    let baseFogNear = 20;
+    let baseFogFar = 40;
+    let mouseAmpX = 1.2;
+    let mouseAmpY = 1.2;
+    let dragDX = 0.006;
+    let dragDY = 0.02;
 
-    // pull the camera back and give a slightly higher vantage on narrow
-    // (portrait / mobile) viewports so the whole scene still reads well
     function tuneCameraForAspect(aspect) {
       if (aspect < 0.62) {
-        baseRadius = 22;
-        baseHeight = 11.5;
+        baseRadius = 9.5;
+        baseHeight = 3.6;
+        baseFogNear = 7;
+        baseFogFar = 24;
+        mouseAmpX = 2.2;
+        mouseAmpY = 1.8;
+        dragDX = 0.008;
+        dragDY = 0.028;
+        camera.fov = 62;
       } else if (aspect < 0.85) {
-        baseRadius = 19;
-        baseHeight = 10;
+        baseRadius = 12;
+        baseHeight = 5.2;
+        baseFogNear = 12;
+        baseFogFar = 30;
+        mouseAmpX = 1.8;
+        mouseAmpY = 1.5;
+        dragDX = 0.007;
+        dragDY = 0.024;
+        camera.fov = 56;
       } else if (aspect < 1.15) {
         baseRadius = 16.5;
         baseHeight = 8.5;
+        baseFogNear = 18;
+        baseFogFar = 36;
+        mouseAmpX = 1.4;
+        mouseAmpY = 1.3;
+        camera.fov = 48;
       } else {
         baseRadius = 14;
         baseHeight = 7.5;
+        baseFogNear = 20;
+        baseFogFar = 40;
+        mouseAmpX = 1.2;
+        mouseAmpY = 1.2;
+        camera.fov = 42;
       }
+      scene.fog.near = baseFogNear;
+      scene.fog.far = baseFogFar;
+      camera.updateProjectionMatrix();
     }
     tuneCameraForAspect(camera.aspect);
 
@@ -444,25 +481,30 @@ function DeliveryScene({ className, vehicle }) {
     }
     mount.addEventListener("pointermove", onPointerMove);
 
-    // drag / swipe to orbit — works for mouse and touch
     const dragState = { active: false, lastX: 0, lastY: 0 };
     let dragAngleOffset = 0;
     let dragHeightOffset = 0;
-    mount.style.touchAction = "pan-y";
+    mount.style.touchAction = "none";
 
     function onPointerDown(e) {
+      if (isMobile && typeof DeviceOrientationEvent !== "undefined" &&
+          typeof DeviceOrientationEvent.requestPermission === "function") {
+        DeviceOrientationEvent.requestPermission()
+          .then((p) => { if (p === "granted") enableOrientation(); })
+          .catch(() => {});
+      }
       dragState.active = true;
       dragState.lastX = e.clientX;
       dragState.lastY = e.clientY;
-      mount.setPointerCapture(e.pointerId);
+      try { mount.setPointerCapture(e.pointerId); } catch (err) {}
       mount.classList.add("wp-dragging");
     }
     function onDragMove(e) {
       if (!dragState.active) return;
       const dx = e.clientX - dragState.lastX;
       const dy = e.clientY - dragState.lastY;
-      dragAngleOffset -= dx * 0.006;
-      dragHeightOffset = Math.max(-4, Math.min(6, dragHeightOffset + dy * 0.02));
+      dragAngleOffset -= dx * dragDX;
+      dragHeightOffset = Math.max(-4, Math.min(6, dragHeightOffset + dy * dragDY));
       dragState.lastX = e.clientX;
       dragState.lastY = e.clientY;
     }
@@ -475,6 +517,64 @@ function DeliveryScene({ className, vehicle }) {
     mount.addEventListener("pointermove", onDragMove);
     mount.addEventListener("pointerup", onPointerUp);
     mount.addEventListener("pointercancel", onPointerUp);
+
+    let gyroAlphaOffset = null;
+    let gyroBetaCenter = null;
+    let gyroGammaCenter = null;
+    let gyroAngleOffset = 0;
+    let gyroHeightOffset = 0;
+    let gyroPanX = 0;
+    let gyroPanY = 0;
+
+    function onOrientation(e) {
+      if (e.alpha == null) return;
+      if (gyroAlphaOffset == null) {
+        gyroAlphaOffset = e.alpha;
+        gyroBetaCenter = e.beta;
+        gyroGammaCenter = e.gamma;
+      }
+      let dGamma = (e.gamma - gyroGammaCenter) || 0;
+      let dBeta = (e.beta - gyroBetaCenter) || 0;
+      dGamma = Math.max(-30, Math.min(30, dGamma));
+      dBeta = Math.max(-25, Math.min(25, dBeta));
+      const smooth = 0.12;
+      gyroAngleOffset += (-dGamma * 0.012 - gyroAngleOffset) * smooth;
+      gyroHeightOffset += (-dBeta * 0.015 - gyroHeightOffset) * smooth;
+      gyroPanX += (-dGamma * 0.08 - gyroPanX) * smooth;
+      gyroPanY += (-dBeta * 0.06 - gyroPanY) * smooth;
+    }
+    function enableOrientation() {
+      window.addEventListener("deviceorientation", onOrientation, false);
+    }
+    if (isMobile && typeof DeviceOrientationEvent !== "undefined" &&
+        typeof DeviceOrientationEvent.requestPermission !== "function") {
+      enableOrientation();
+    }
+
+    let lastTouchDist = 0;
+    let pinchZoomOffset = 0;
+
+    function onTouchStart(e) {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        lastTouchDist = Math.sqrt(dx * dx + dy * dy);
+      }
+    }
+    function onTouchMove(e) {
+      if (e.touches.length === 2 && lastTouchDist > 0) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const delta = (dist - lastTouchDist) * 0.02;
+        pinchZoomOffset = Math.max(-3, Math.min(4, pinchZoomOffset + delta));
+        lastTouchDist = dist;
+      }
+    }
+    function onTouchEnd() { lastTouchDist = 0; }
+    mount.addEventListener("touchstart", onTouchStart, { passive: true });
+    mount.addEventListener("touchmove", onTouchMove, { passive: true });
+    mount.addEventListener("touchend", onTouchEnd, { passive: true });
 
     let raf;
     let t = 0;
@@ -491,14 +591,13 @@ function DeliveryScene({ className, vehicle }) {
       mouse.x += (mouseTarget.x - mouse.x) * 0.04;
       mouse.y += (mouseTarget.y - mouse.y) * 0.04;
 
-      // scroll pulls the camera back and up, revealing more of the road
       const heroEl = mount.closest(".wp-hero");
       const heroH = heroEl ? heroEl.offsetHeight : 1;
       const scrollProgress = Math.max(0, Math.min(1, window.scrollY / heroH));
-      const radius = baseRadius + scrollProgress * 7;
-      const camHeight = baseHeight + scrollProgress * 5 + dragHeightOffset;
+      const mobileScrollDamp = isMobile ? 0.35 : 1;
+      const radius = baseRadius + scrollProgress * 7 * mobileScrollDamp + pinchZoomOffset;
+      const camHeight = baseHeight + scrollProgress * 5 * mobileScrollDamp + dragHeightOffset + gyroHeightOffset;
 
-      // ping-pong the truck back and forth along the road
       const cycle = (t % 2 <= 1 ? t % 2 : 2 - (t % 2));
       const segments = WAYPOINTS.length - 1;
       const scaled = cycle * segments;
@@ -524,11 +623,19 @@ function DeliveryScene({ className, vehicle }) {
         rig.marker.position.y = rig.bobBase + Math.sin(t * 6) * 0.05;
       }
 
-      const viewAngle = angle + dragAngleOffset;
-      camera.position.x = center.x + Math.cos(viewAngle) * radius + mouse.x * 1.2;
-      camera.position.z = center.z + Math.sin(viewAngle) * radius + mouse.y * 0.6;
-      camera.position.y = camHeight - mouse.y * 1.2;
-      camera.lookAt(center);
+      const viewAngle = angle + dragAngleOffset + gyroAngleOffset;
+      camera.position.x =
+        center.x + Math.cos(viewAngle) * radius +
+        mouse.x * mouseAmpX + gyroPanX;
+      camera.position.z =
+        center.z + Math.sin(viewAngle) * radius +
+        mouse.y * (mouseAmpY * 0.6);
+      camera.position.y =
+        camHeight - mouse.y * mouseAmpY + gyroPanY;
+
+      const lookShift = new THREE.Vector3(gyroPanX * 0.4, gyroPanY * 0.3, 0);
+      const lookTarget = center.clone().add(lookShift);
+      camera.lookAt(lookTarget);
 
       renderer.render(scene, camera);
       raf = requestAnimationFrame(frame);
@@ -554,6 +661,10 @@ function DeliveryScene({ className, vehicle }) {
       mount.removeEventListener("pointermove", onDragMove);
       mount.removeEventListener("pointerup", onPointerUp);
       mount.removeEventListener("pointercancel", onPointerUp);
+      mount.removeEventListener("touchstart", onTouchStart);
+      mount.removeEventListener("touchmove", onTouchMove);
+      mount.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("deviceorientation", onOrientation, false);
       scene.traverse((obj) => {
         if (obj.geometry) obj.geometry.dispose();
         if (obj.material) {
@@ -1195,10 +1306,13 @@ export default function App() {
 
         .wp-hero {
           position: relative;
-          min-height: 620px;
+          min-height: 100vh;
           display: flex;
           align-items: flex-end;
           overflow: hidden;
+        }
+        @media (max-width: 768px) {
+          .wp-hero { min-height: 92vh; }
         }
         .wp-hero-canvas-wrap {
           position: absolute;
@@ -1209,6 +1323,7 @@ export default function App() {
           position: absolute;
           inset: 0;
           cursor: grab;
+          touch-action: none;
         }
         .wp-hero-canvas.wp-dragging { cursor: grabbing; }
         .wp-vehicle-toggle {
@@ -1918,7 +2033,6 @@ export default function App() {
         }
         @media (max-width: 520px) {
           .wp-feature-grid { grid-template-columns: 1fr; }
-          .wp-hero { min-height: 620px; }
           .wp-nav { padding-top: 14px; padding-bottom: 14px; padding-left: max(18px, env(safe-area-inset-left)); padding-right: max(18px, env(safe-area-inset-right)); }
           .wp-hero-content, .wp-status, .wp-pay, .wp-features, .wp-footer {
             padding-left: max(18px, env(safe-area-inset-left));
@@ -1988,7 +2102,7 @@ export default function App() {
         </div>
         <div className="wp-hero-fade" />
         <div className={`wp-hero-hint ${hintHidden ? "wp-hidden" : ""}`}>
-          drag or swipe to look around
+          tilt · swipe · pinch · drag to look around
         </div>
         <div className="wp-vehicle-toggle" onPointerDown={(e) => e.stopPropagation()}>
           <button
