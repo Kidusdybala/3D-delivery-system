@@ -11,14 +11,14 @@ function TiltCard({ children, className, style }) {
     const rect = el.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 7;
-    const rotateX = -((y - rect.height / 2) / (rect.height / 2)) * 7;
-    el.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
+    const tx = ((x - rect.width / 2) / (rect.width / 2)) * 3;
+    const ty = ((y - rect.height / 2) / (rect.height / 2)) * 3;
+    el.style.transform = `translate(${tx}px, ${ty - 2}px) scale(1.01)`;
   }
   function handleLeave() {
     const el = ref.current;
     if (!el) return;
-    el.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg)";
+    el.style.transform = "translate(0, 0) scale(1)";
     el.style.touchAction = "";
   }
   function handleDown() {

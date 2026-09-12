@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
-  Check,
-  Lock,
   LogOut,
   Package,
   Plus,
@@ -13,8 +11,6 @@ import {
 } from "lucide-react";
 import {
   CATEGORIES,
-  DEFAULT_PASSWORD,
-  checkAdminPassword,
   fileToDataURL,
   formatPrice,
   getCategory,
@@ -106,9 +102,6 @@ const adminStyles = `
 `;
 
 export default function AdminPage({ onNav }) {
-  const [authed, setAuthed] = useState(false);
-  const [loginForm, setLoginForm] = useState("");
-  const [loginError, setLoginError] = useState("");
   const [tab, setTab] = useState("all");
   const [products, setProducts] = useState([]);
   const [formOpen, setFormOpen] = useState(false);
@@ -118,7 +111,6 @@ export default function AdminPage({ onNav }) {
   const fileInput = useRef(null);
 
   useEffect(() => {
-    setAuthed(isAdminAuthed());
     setProducts(loadProducts());
   }, []);
 
@@ -135,20 +127,9 @@ export default function AdminPage({ onNav }) {
     return base;
   }, [products]);
 
-  function handleLogin() {
-    if (checkAdminPassword(loginForm)) {
-      setAdminAuthed(true);
-      setAuthed(true);
-      setLoginError("");
-    } else {
-      setLoginError("Incorrect password. Try the default hint in the box below.");
-    }
-  }
-
   function handleLogout() {
     setAdminAuthed(false);
-    setAuthed(false);
-    setLoginForm("");
+    window.location.hash = "#/admin/login";
   }
 
   function openAdd() {
@@ -235,129 +216,94 @@ export default function AdminPage({ onNav }) {
           <div className="wa-brand">
             Way<span className="accent">point</span> · Admin
           </div>
-          {authed && (
-            <button className="wa-btn" onClick={handleLogout}>
-              <LogOut size={16} /> Log out
-            </button>
-          )}
+          <button className="wa-btn" onClick={handleLogout}>
+            <LogOut size={16} /> Log out
+          </button>
         </div>
 
-        {!authed ? (
-          <div className="wa-login">
-            <div className="wa-card">
-              <h2><Lock size={18} style={{ verticalAlign: -4, marginRight: 8, color: "#ff9f3a" }} />Admin sign in</h2>
-              <div className="wa-muted">Use the password to add, edit, and remove products. <br />Default: <code style={{ color: "#ffd2a3" }}>{DEFAULT_PASSWORD}</code></div>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleLogin();
-                }}
-              >
-                <div className="wa-field">
-                  <label>Password</label>
-                  <input
-                    type="password"
-                    className="wa-input"
-                    value={loginForm}
-                    onChange={(e) => setLoginForm(e.target.value)}
-                    placeholder="Enter admin password"
-                    autoFocus
-                  />
-                </div>
-                <button type="submit" className="wa-btn primary" style={{ width: "100%", justifyContent: "center" }}>
-                  <Check size={16} /> Sign in
-                </button>
-                {loginError && <div className="wa-error">{loginError}</div>}
-              </form>
-            </div>
+        <div className="wa-hero">
+          <h1>Product manager</h1>
+          <p>Add and edit products — they appear instantly on the Waypoint shop page.</p>
+        </div>
+
+        <div className="wa-stats">
+          <div className="wa-stat">
+            <div className="wa-stat-label">Total products</div>
+            <div className="wa-stat-value accent">{counts.all}</div>
           </div>
-        ) : (
-          <>
-            <div className="wa-hero">
-              <h1>Product manager</h1>
-              <p>Add and edit products — they appear instantly on the Waypoint shop page.</p>
+          {CATEGORIES.map((c) => (
+            <div className="wa-stat" key={c.id}>
+              <div className="wa-stat-label">{c.label}</div>
+              <div className="wa-stat-value">{counts[c.id] || 0}</div>
             </div>
+          ))}
+        </div>
 
-            <div className="wa-stats">
-              <div className="wa-stat">
-                <div className="wa-stat-label">Total products</div>
-                <div className="wa-stat-value accent">{counts.all}</div>
-              </div>
-              {CATEGORIES.map((c) => (
-                <div className="wa-stat" key={c.id}>
-                  <div className="wa-stat-label">{c.label}</div>
-                  <div className="wa-stat-value">{counts[c.id] || 0}</div>
-                </div>
-              ))}
-            </div>
+        <div className="wa-row">
+          <div className="wa-tabs" role="tablist">
+            <button className={`wa-tab ${tab === "all" ? "active" : ""}`} onClick={() => setTab("all")}>
+              All ({counts.all})
+            </button>
+            {CATEGORIES.map((c) => (
+              <button
+                key={c.id}
+                className={`wa-tab ${tab === c.id ? "active" : ""}`}
+                onClick={() => setTab(c.id)}
+              >
+                {c.label} ({counts[c.id] || 0})
+              </button>
+            ))}
+          </div>
+          <button className="wa-btn primary" onClick={openAdd}>
+            <Plus size={16} /> Add product
+          </button>
+        </div>
 
-            <div className="wa-row">
-              <div className="wa-tabs" role="tablist">
-                <button className={`wa-tab ${tab === "all" ? "active" : ""}`} onClick={() => setTab("all")}>
-                  All ({counts.all})
-                </button>
-                {CATEGORIES.map((c) => (
-                  <button
-                    key={c.id}
-                    className={`wa-tab ${tab === c.id ? "active" : ""}`}
-                    onClick={() => setTab(c.id)}
-                  >
-                    {c.label} ({counts[c.id] || 0})
-                  </button>
-                ))}
-              </div>
-              <button className="wa-btn primary" onClick={openAdd}>
-                <Plus size={16} /> Add product
+        <div className="wa-grid">
+          {filtered.length === 0 ? (
+            <div className="wa-empty">
+              <Package size={36} style={{ marginBottom: 10, opacity: 0.5 }} />
+              <div>No products in this category yet.</div>
+              <button className="wa-btn primary" style={{ marginTop: 16 }} onClick={openAdd}>
+                <Plus size={14} /> Add the first one
               </button>
             </div>
-
-            <div className="wa-grid">
-              {filtered.length === 0 ? (
-                <div className="wa-empty">
-                  <Package size={36} style={{ marginBottom: 10, opacity: 0.5 }} />
-                  <div>No products in this category yet.</div>
-                  <button className="wa-btn primary" style={{ marginTop: 16 }} onClick={openAdd}>
-                    <Plus size={14} /> Add the first one
-                  </button>
-                </div>
-              ) : (
-                filtered.map((p) => {
-                  const cat = getCategory(p.category);
-                  return (
-                    <div className="wa-pcard" key={p.id}>
-                      <div className="wa-pimg">
-                        {p.image ? (
-                          <img src={p.image} alt={p.model} loading="lazy" />
-                        ) : (
-                          <ImageIcon size={36} />
-                        )}
-                        <span className="wa-pbadge">{cat.label}</span>
-                      </div>
-                      <div className="wa-pbody">
-                        <div className="wa-pbrand">{p.brand}</div>
-                        <h4 className="wa-pname">{p.model}</h4>
-                        <div className="wa-pquality">★ {p.quality}</div>
-                        {p.description && <div className="wa-pdesc">{p.description}</div>}
-                        <div className="wa-pfoot">
-                          <div className="wa-pprice">{formatPrice(p.price, p.currency)}</div>
-                          <div className="wa-pphone">📞 {p.phone}</div>
-                        </div>
-                      </div>
-                      <div className="wa-pactions">
-                        <button className="wa-btn" style={{ flex: 1, justifyContent: "center" }} onClick={() => openEdit(p)}>
-                          <Save size={14} /> Edit
-                        </button>
-                        <button className="wa-btn danger" onClick={() => handleDelete(p)} title="Delete">
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
+          ) : (
+            filtered.map((p) => {
+              const cat = getCategory(p.category);
+              return (
+                <div className="wa-pcard" key={p.id}>
+                  <div className="wa-pimg">
+                    {p.image ? (
+                      <img src={p.image} alt={p.model} loading="lazy" />
+                    ) : (
+                      <ImageIcon size={36} />
+                    )}
+                    <span className="wa-pbadge">{cat.label}</span>
+                  </div>
+                  <div className="wa-pbody">
+                    <div className="wa-pbrand">{p.brand}</div>
+                    <h4 className="wa-pname">{p.model}</h4>
+                    <div className="wa-pquality">★ {p.quality}</div>
+                    {p.description && <div className="wa-pdesc">{p.description}</div>}
+                    <div className="wa-pfoot">
+                      <div className="wa-pprice">{formatPrice(p.price, p.currency)}</div>
+                      <div className="wa-pphone">📞 {p.phone}</div>
                     </div>
-                  );
-                })
-              )}
-            </div>
-          </>
-        )}
+                  </div>
+                  <div className="wa-pactions">
+                    <button className="wa-btn" style={{ flex: 1, justifyContent: "center" }} onClick={() => openEdit(p)}>
+                      <Save size={14} /> Edit
+                    </button>
+                    <button className="wa-btn danger" onClick={() => handleDelete(p)} title="Delete">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
 
         {formOpen && (
           <div className="wa-modal-bg" onClick={(e) => { if (e.target === e.currentTarget) setFormOpen(false); }}>

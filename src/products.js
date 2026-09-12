@@ -1,5 +1,6 @@
 const STORAGE_KEY = "waypoint.products.v1";
 const AUTH_KEY = "waypoint.admin.auth.v1";
+const DEFAULT_USERNAME = "admin";
 const DEFAULT_PASSWORD = "admin123";
 
 const CATEGORIES = [
@@ -116,8 +117,10 @@ function setAdminAuthed(value) {
   } catch {}
 }
 
-function checkAdminPassword(input) {
-  return String(input || "") === DEFAULT_PASSWORD;
+function checkAdminCredentials({ username, password }) {
+  const u = String(username || "").trim().toLowerCase();
+  const p = String(password || "");
+  return u === DEFAULT_USERNAME && p === DEFAULT_PASSWORD;
 }
 
 function fileToDataURL(file) {
@@ -135,6 +138,7 @@ function fileToDataURL(file) {
 
 export {
   CATEGORIES,
+  DEFAULT_USERNAME,
   DEFAULT_PASSWORD,
   loadProducts,
   saveProducts,
@@ -142,6 +146,6 @@ export {
   getCategory,
   isAdminAuthed,
   setAdminAuthed,
-  checkAdminPassword,
+  checkAdminCredentials,
   fileToDataURL,
 };

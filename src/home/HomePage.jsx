@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Menu, X, ShoppingBag, Lock, Send, Music2, Facebook, LogIn } from "lucide-react";
+import { Menu, X, ShoppingBag, Send, Music2, Facebook, LogIn } from "lucide-react";
 import homeStyles from "./home.css.js";
 import HeroSection from "./sections/HeroSection.jsx";
 import TrackSection from "./sections/TrackSection.jsx";
@@ -145,17 +145,10 @@ function HomePage() {
               onClick={() => goTo(l.id)}
               style={l.action ? { color: "var(--amber)" } : undefined}
             >
-              {l.id === "shop" && <ShoppingBag size={12} style={{ marginRight: 4 }} />}
+              {l.id === "shop" && <ShoppingBag size={12} />}
               {l.label}
             </button>
           ))}
-          <button
-            onClick={() => window.location.hash = "#/admin"}
-            style={{ display: "inline-flex", alignItems: "center", gap: 4, opacity: 0.75 }}
-            title="Admin"
-          >
-            <Lock size={12} />
-          </button>
         </nav>
         <button className="wp-nav-cta wp-nav-cta-desktop" onClick={() => goTo("track")}>
           <LogIn size={14} /> Sign in
@@ -180,11 +173,8 @@ function HomePage() {
               {l.label}
             </button>
           ))}
-          <button style={{ display: "inline-flex", alignItems: "center", gap: 8, borderBottom: "1px solid var(--line)" }} onClick={() => { setMenuOpen(false); window.location.hash = "#/shop"; }}>
+          <button onClick={() => { setMenuOpen(false); window.location.hash = "#/shop"; }}>
             <ShoppingBag size={14} /> Full Shop
-          </button>
-          <button style={{ display: "inline-flex", alignItems: "center", gap: 8 }} onClick={() => { setMenuOpen(false); window.location.hash = "#/admin"; }}>
-            <Lock size={14} /> Admin Panel
           </button>
           <button className="wp-nav-cta" onClick={() => goTo("track")}>
             <LogIn size={14} /> Sign in
