@@ -37,7 +37,26 @@ const loginStyles = `
   .wa-gate { background: linear-gradient(135deg, rgba(255,159,58,0.12), rgba(96,124,246,0.08)); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 26px; margin-bottom: 24px; text-align: center; }
   .wa-gate h1 { margin: 6px 0; font-size: clamp(24px, 4vw, 30px); letter-spacing: -0.02em; }
   .wa-gate p { margin: 0; color: #a6b0c7; font-size: 14px; }
-`;
+  .wa-btn svg { flex-shrink: 0; }
+  @media (max-width: 720px) {
+    .wa-wrap { padding-top: 14px; padding-bottom: 60px; }
+    .wa-top { gap: 8px; margin-bottom: 20px; }
+    .wa-brand { order: -1; width: 100%; font-size: 18px; text-align: center; }
+    .wa-back-btn { padding: 9px; font-size: 13.5px; }
+    .wa-back-btn span { display: none; }
+    .wa-back-btn svg { width: 18px; height: 18px; }
+    .wa-card { padding: 24px 18px; border-radius: 18px; }
+    .wa-gate { padding: 20px; border-radius: 18px; }
+    .wa-login { margin: 4vh auto 0; }
+    .wa-input { padding: 12px 14px 12px 40px; font-size: 14px; }
+  }
+  @media (max-width: 420px) {
+    .wa-wrap { padding-left: 14px; padding-right: 14px; }
+    .wa-card { padding: 20px 16px; }
+    .wa-gate { padding: 18px; }
+    .wa-btn { padding: 8px 10px; font-size: 12.5px; }
+  }
+  `;
 
 export default function AdminLoginPage({ onNav }) {
   const [username, setUsername] = useState("");
@@ -67,7 +86,7 @@ export default function AdminLoginPage({ onNav }) {
       <style>{loginStyles}</style>
       <div className="wa-wrap">
         <div className="wa-top">
-          <button className="wa-btn" onClick={() => onNav?.("home")}>
+          <button className="wa-btn wa-back-btn" onClick={() => onNav?.("home")}>
             <ArrowLeft size={16} /> Back to Waypoint
           </button>
           <div className="wa-brand">

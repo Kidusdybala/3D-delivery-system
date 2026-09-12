@@ -131,8 +131,27 @@ export default function ShopPage({ onNav }) {
     .ws-filter.active { background: linear-gradient(135deg, #ff9f3a, #ff7a1f); color: #1a1306; }
     .ws-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
     .ws-empty { grid-column: 1/-1; padding: 60px 20px; text-align: center; color: #8992ab; border: 1px dashed rgba(255,255,255,0.06); border-radius: 18px; }
-    .ws-btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #e6ecff; padding: 10px 14px; border-radius: 12px; cursor: pointer; transition: all .18s ease; font-size: 14px; font-weight: 600; }
+    .ws-btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #e6ecff; padding: 10px 14px; border-radius: 12px; cursor: pointer; transition: all .18s ease; font-size: 14px; font-weight: 600; white-space: nowrap; font-family: inherit; }
     .ws-btn:hover { background: rgba(255,159,58,0.08); border-color: rgba(255,159,58,0.35); color: #ffd2a3; }
+    .ws-btn svg { flex-shrink: 0; }
+    @media (max-width: 720px) {
+      .ws-wrap { padding-top: 14px; padding-bottom: 60px; }
+      .ws-top { gap: 8px; margin-bottom: 20px; }
+      .ws-brand { order: -1; width: 100%; font-size: 18px; text-align: center; }
+      .ws-hero { padding: 20px 18px; border-radius: 18px; }
+      .ws-filters { width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; scrollbar-width: none; }
+      .ws-filters::-webkit-scrollbar { display: none; }
+      .ws-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+      .ws-empty { padding: 40px 16px; }
+      .ws-btn { padding: 9px; font-size: 13.5px; }
+      .ws-btn span { display: none; }
+      .ws-btn svg { width: 18px; height: 18px; }
+      .ws-btn.admin-btn { margin-left: auto; }
+    }
+    @media (max-width: 420px) {
+      .ws-grid { grid-template-columns: 1fr; }
+      .ws-brand { font-size: 17px; }
+    }
   `;
 
   return (
@@ -141,11 +160,11 @@ export default function ShopPage({ onNav }) {
       <div className="ws-wrap">
         <div className="ws-top">
           <button className="ws-btn" onClick={() => onNav?.("home")}>
-            <ArrowLeft size={16} /> Back to Waypoint
+            <ArrowLeft size={16} /> <span>Back to Waypoint</span>
           </button>
           <div className="ws-brand">Way<span className="accent">point</span> · Shop</div>
-          <button className="ws-btn" onClick={() => onNav?.("admin")}>
-            <Filter size={16} /> Admin
+          <button className="ws-btn admin-btn" onClick={() => onNav?.("admin")}>
+            <Filter size={16} /> <span>Admin</span>
           </button>
         </div>
 

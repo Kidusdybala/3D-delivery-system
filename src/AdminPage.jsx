@@ -93,7 +93,34 @@ const adminStyles = `
   @media (max-width: 560px) {
     .wa-grid2 { grid-template-columns: 1fr; }
     .wa-modal { max-height: 94vh; }
+    .wa-top { gap: 8px; margin-bottom: 20px; }
+    .wa-brand { order: -1; width: 100%; font-size: 18px; text-align: center; }
+    .wa-btn.back-btn { padding: 9px; font-size: 13.5px; }
+    .wa-btn.back-btn span { display: none; }
+    .wa-btn.back-btn svg { width: 18px; height: 18px; }
+    .wa-btn.logout-btn { margin-left: auto; }
+    .wa-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+    .wa-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .wa-stat { padding: 12px 14px; border-radius: 12px; }
+    .wa-stat-value { font-size: 20px; }
+    .wa-row { flex-direction: column; align-items: stretch; }
+    .wa-row > * { width: 100%; }
+    .wa-tabs { width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; scrollbar-width: none; }
+    .wa-tabs::-webkit-scrollbar { display: none; }
+    .wa-pcard { padding: 0; }
+    .wa-modal { margin-top: 2vh; }
+    .wa-modal-head { padding: 14px 16px; }
+    .wa-modal-body { padding: 16px; }
+    .wa-hero { padding: 20px 18px; border-radius: 18px; }
   }
+  @media (max-width: 420px) {
+    .wa-wrap { padding-left: 14px; padding-right: 14px; }
+    .wa-stats { grid-template-columns: 1fr 1fr; }
+    .wa-grid { grid-template-columns: 1fr; }
+    .wa-btn { padding: 8px 10px; font-size: 12.5px; }
+    .wa-pcard { padding: 0; }
+  }
+  .wa-btn svg { flex-shrink: 0; }
   .wa-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
   .wa-stat { background: #131a2d; border: 1px solid rgba(255,255,255,0.06); padding: 16px 18px; border-radius: 16px; }
   .wa-stat-label { color: #8992ab; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
@@ -210,13 +237,13 @@ export default function AdminPage({ onNav }) {
       <style>{adminStyles}</style>
       <div className="wa-wrap">
         <div className="wa-top">
-          <button className="wa-btn" onClick={() => onNav?.("home")}>
+          <button className="wa-btn back-btn" onClick={() => onNav?.("home")}>
             <ArrowLeft size={16} /> Back to Waypoint
           </button>
           <div className="wa-brand">
             Way<span className="accent">point</span> · Admin
           </div>
-          <button className="wa-btn" onClick={handleLogout}>
+          <button className="wa-btn logout-btn" onClick={handleLogout}>
             <LogOut size={16} /> Log out
           </button>
         </div>
