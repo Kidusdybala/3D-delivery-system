@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   LogOut,
+  MapPin,
   Package,
   Plus,
   Save,
@@ -241,7 +242,7 @@ export default function AdminPage({ onNav }) {
             <ArrowLeft size={16} /> Back to Waypoint
           </button>
           <div className="wa-brand">
-            Way<span className="accent">point</span> · Admin
+            <MapPin size={18} strokeWidth={2} style={{ color: "#ff9f3a" }} /> Way<span className="accent">point</span> · Admin
           </div>
           <button className="wa-btn logout-btn" onClick={handleLogout}>
             <LogOut size={16} /> Log out

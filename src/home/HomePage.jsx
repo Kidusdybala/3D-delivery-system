@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Menu, X, ShoppingBag, Send, Music2, Facebook, LogIn } from "lucide-react";
+import { Menu, MapPin, X, ShoppingBag, Send, Music2, Facebook, LogIn } from "lucide-react";
 import homeStyles from "./home.css.js";
 import HeroSection from "./sections/HeroSection.jsx";
 import TrackSection from "./sections/TrackSection.jsx";
@@ -134,9 +134,10 @@ function HomePage() {
     <div className="wp-root" ref={rootRef}>
       <style>{homeStyles}</style>
       <header className="wp-nav">
-        <button className="wp-logo" onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })}>
-          Way<span>point</span>
-        </button>
+          <button className="wp-logo" onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })}>
+            <MapPin size={18} strokeWidth={2} style={{ color: "var(--amber)", verticalAlign: "-2px", marginRight: "4px" }} />
+            Way<span>point</span>
+          </button>
         <nav className="wp-nav-links">
           {navLinks.map((l) => (
             <button

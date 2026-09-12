@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Lock, Check, User } from "lucide-react";
+import { ArrowLeft, Lock, MapPin, Check, User } from "lucide-react";
 import {
   DEFAULT_USERNAME,
   DEFAULT_PASSWORD,
@@ -90,7 +90,7 @@ export default function AdminLoginPage({ onNav }) {
             <ArrowLeft size={16} /> Back to Waypoint
           </button>
           <div className="wa-brand">
-            Way<span className="accent">point</span> · Admin
+            <MapPin size={18} strokeWidth={2} style={{ color: "#ff9f3a" }} /> Way<span className="accent">point</span> · Admin
           </div>
           <div style={{ width: 140 }} />
         </div>

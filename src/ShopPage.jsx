@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   Filter,
+  MapPin,
   Phone,
   ShoppingBag,
   Star,
@@ -121,7 +122,7 @@ export default function ShopPage({ onNav }) {
     .ws-root { background: #0b0f1a; min-height: 100vh; color: #e6ecff; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
     .ws-wrap { max-width: 1200px; margin: 0 auto; padding: 32px clamp(18px, 4vw, 40px) 80px; }
     .ws-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
-    .ws-brand { font-weight: 800; font-size: 22px; letter-spacing: -0.01em; }
+    .ws-brand { display: inline-flex; align-items: center; gap: 5px; font-weight: 800; font-size: 22px; letter-spacing: -0.01em; }
     .ws-brand .accent { color: #ff9f3a; }
     .ws-hero { background: linear-gradient(135deg, rgba(255,159,58,0.12), rgba(96,124,246,0.08)); border: 1px solid rgba(255,255,255,0.06); border-radius: 22px; padding: 28px; margin-bottom: 28px; }
     .ws-hero h1 { margin: 0 0 6px; font-size: clamp(26px, 4vw, 34px); letter-spacing: -0.02em; }
@@ -137,7 +138,7 @@ export default function ShopPage({ onNav }) {
     @media (max-width: 720px) {
       .ws-wrap { padding-top: 14px; padding-bottom: 60px; }
       .ws-top { gap: 8px; margin-bottom: 20px; }
-      .ws-brand { order: -1; width: 100%; font-size: 18px; text-align: center; }
+      .ws-brand { order: -1; width: 100%; font-size: 18px; text-align: center; justify-content: center; }
       .ws-hero { padding: 20px 18px; border-radius: 18px; }
       .ws-filters { width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; scrollbar-width: none; }
       .ws-filters::-webkit-scrollbar { display: none; }
@@ -162,7 +163,7 @@ export default function ShopPage({ onNav }) {
           <button className="ws-btn" onClick={() => onNav?.("home")}>
             <ArrowLeft size={16} /> <span>Back to Waypoint</span>
           </button>
-          <div className="ws-brand">Way<span className="accent">point</span> · Shop</div>
+          <div className="ws-brand"><MapPin size={18} strokeWidth={2} style={{ color: "#ff9f3a" }} /> Way<span className="accent">point</span> · Shop</div>
           <button className="ws-btn admin-btn" onClick={() => onNav?.("admin")}>
             <Filter size={16} /> <span>Admin</span>
           </button>

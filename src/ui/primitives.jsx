@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MapPin } from "lucide-react";
 import { hashStr, inFinderZone, mulberry32 } from "../lib/utils.js";
 import { BRANDS } from "../lib/constants.js";
 
@@ -560,6 +560,7 @@ function PageHeader({ title, subtitle, onBack, backLabel, rightSlot, showBack = 
           {showBack && <BackButton onBack={onBack} label={backLabel || "Back"} />}
         </div>
         <div className="wp-page-header-brand">
+          <MapPin size={18} strokeWidth={2} style={{ color: "#ff9f3a" }} />
           Way<span className="accent">point</span>
           {title && <span className="wp-page-header-brand-sub">· {title}</span>}
         </div>
