@@ -1,18 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Menu, X, ShoppingBag, Lock, Send, Music2, Facebook } from "lucide-react";
+import { Menu, X, ShoppingBag, Lock, Send, Music2, Facebook, LogIn } from "lucide-react";
 import homeStyles from "./home.css.js";
 import HeroSection from "./sections/HeroSection.jsx";
 import TrackSection from "./sections/TrackSection.jsx";
 import PaySection from "./sections/PaySection.jsx";
 import PricingSection from "./sections/PricingSection.jsx";
-import ProductFormSection from "./sections/ProductFormSection.jsx";
 import BanksSection from "./sections/BanksSection.jsx";
 import DonateSection from "./sections/DonateSection.jsx";
 import FeedbackSection from "./sections/FeedbackSection.jsx";
 import ContactSection from "./sections/ContactSection.jsx";
 import FeaturesSection from "./sections/FeaturesSection.jsx";
 import { ProductsShowcase } from "../ShopPage.jsx";
-import { safeNum } from "../lib/utils.js";
 
 function HomePage() {
   const [trackingValue, setTrackingValue] = useState("");
@@ -27,14 +25,6 @@ function HomePage() {
   const [ratePerKm, setRatePerKm] = useState(28);
   const [feePercent, setFeePercent] = useState(8);
   const [taxPercent, setTaxPercent] = useState(15);
-
-  const [productCategory, setProductCategory] = useState("perfumes");
-  const [productPrice, setProductPrice] = useState("");
-  const [productModel, setProductModel] = useState("");
-  const [productPhone, setProductPhone] = useState("");
-  const [productBrand, setProductBrand] = useState("");
-  const [productQuality, setProductQuality] = useState("premium");
-  const [productRequests, setProductRequests] = useState([]);
 
   const [bankAmount, setBankAmount] = useState(250);
   const [donationAmount, setDonationAmount] = useState(500);
@@ -51,7 +41,7 @@ function HomePage() {
     { id: "track", label: "Track" },
     { id: "pay", label: "Pay" },
     { id: "pricing", label: "Pricing" },
-    { id: "products", label: "Products" },
+    { id: "shop", label: "Shop", action: () => (window.location.hash = "#/shop") },
     { id: "banks", label: "Banks" },
     { id: "donate", label: "Donate" },
     { id: "feedback", label: "Feedback" },
@@ -61,30 +51,11 @@ function HomePage() {
 
   function goTo(id) {
     setMenuOpen(false);
+    const link = navLinks.find((l) => l.id === id);
+    if (link && link.action) return link.action();
     const el = document.getElementById(id);
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (el) el.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-  }
-
-  function submitProductRequest() {
-    const req = {
-      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-      category: productCategory,
-      price: safeNum(productPrice),
-      model: productModel.trim(),
-      phone: productPhone.trim(),
-      brand: productBrand.trim(),
-      quality: productQuality,
-      createdAt: new Date().toISOString(),
-    };
-
-    if (!req.model || !req.phone || !req.brand) return;
-
-    setProductRequests((list) => [req, ...list].slice(0, 12));
-    setProductPrice("");
-    setProductModel("");
-    setProductPhone("");
-    setProductBrand("");
   }
 
   function addFeedbackFiles(fileList) {
@@ -172,13 +143,12 @@ function HomePage() {
               key={l.id}
               className={activeSection === l.id ? "active" : ""}
               onClick={() => goTo(l.id)}
+              style={l.action ? { color: "var(--amber)" } : undefined}
             >
+              {l.id === "shop" && <ShoppingBag size={12} style={{ marginRight: 4 }} />}
               {l.label}
             </button>
           ))}
-          <button onClick={() => window.location.hash = "#/shop"} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-            <ShoppingBag size={12} /> Shop
-          </button>
           <button
             onClick={() => window.location.hash = "#/admin"}
             style={{ display: "inline-flex", alignItems: "center", gap: 4, opacity: 0.75 }}
@@ -188,7 +158,7 @@ function HomePage() {
           </button>
         </nav>
         <button className="wp-nav-cta wp-nav-cta-desktop" onClick={() => goTo("track")}>
-          Get the app
+          <LogIn size={14} /> Sign in
         </button>
         <button
           className="wp-nav-toggle"
@@ -217,7 +187,7 @@ function HomePage() {
             <Lock size={14} /> Admin Panel
           </button>
           <button className="wp-nav-cta" onClick={() => goTo("track")}>
-            Get the app
+            <LogIn size={14} /> Sign in
           </button>
         </div>
       )}
@@ -244,22 +214,6 @@ function HomePage() {
         setFeePercent={setFeePercent}
         taxPercent={taxPercent}
         setTaxPercent={setTaxPercent}
-      />
-      <ProductFormSection
-        productCategory={productCategory}
-        setProductCategory={setProductCategory}
-        productPrice={productPrice}
-        setProductPrice={setProductPrice}
-        productModel={productModel}
-        setProductModel={setProductModel}
-        productPhone={productPhone}
-        setProductPhone={setProductPhone}
-        productBrand={productBrand}
-        setProductBrand={setProductBrand}
-        productQuality={productQuality}
-        setProductQuality={setProductQuality}
-        productRequests={productRequests}
-        submitProductRequest={submitProductRequest}
       />
       <BanksSection bankAmount={bankAmount} setBankAmount={setBankAmount} />
       <DonateSection
