@@ -699,6 +699,9 @@ const homeStyles = `
           aspect-ratio: 1 / 1;
           display: grid;
           place-items: center;
+          max-width: 180px;
+          margin: 0 auto;
+          width: 100%;
         }
         .wp-bank-qr .wp-qr, .wp-bank-qr .wp-qr-img { width: 100%; height: 100%; object-fit: cover; }
         .wp-bank-note { font-size: 12px; color: var(--muted); line-height: 1.5; }
